@@ -1,11 +1,20 @@
 const {Schema,model} = require('mongoose');
 
 const bannerCategoria = new Schema({
-    categoria: String,
-    imagenBanner: String,
-    vincularCategoria: Boolean,
-    mostrarProductos: Boolean,
-    mostrarTitulo: Boolean
+    estilo: Number,
+    banners: [{
+        orientacion: Number,
+        imagenBanner: String,
+        vincular: Boolean,
+        mostrarProductos: Boolean,
+        mostrarTitulo: Boolean,
+        tipo: {
+            categoria: String,
+            temporada: String,
+            genero: String
+        },
+    }],
+    publicado: Boolean
 },{
     timestamps: true
 })

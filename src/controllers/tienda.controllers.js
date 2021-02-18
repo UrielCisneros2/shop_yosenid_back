@@ -14,7 +14,7 @@ tiendaCtrl.subirImagen = async (req,res,next) => {
 
 tiendaCtrl.crearTienda = async (req, res) => {
     console.log(req.body);
-    const {nombre,telefono,calle_numero,cp,colonia,ciudad,lat,lng,politicas,imagenCorp,linkFace,linkInsta,linkTweeter,estado} = req.body;
+    const {nombre,telefono,calle_numero,cp,colonia,ciudad,imagenCorp,linkFace,linkInsta,linkTweeter,estado, diasHorariosEmpresas} = req.body;
     let phone = "";
     if(telefono){
         phone = telefono.trim(" ");
@@ -32,15 +32,11 @@ tiendaCtrl.crearTienda = async (req, res) => {
             ciudad:ciudad,
             estado:estado
         }],
-        ubicacion:[{
-            lat:lat,
-            lng:lng
-        }],
-        politicas:politicas,
         imagenCorp:imagenCorp,
         linkFace:linkFace,
         linkInsta:linkInsta,
-        linkTweeter:linkTweeter
+        linkTweeter:linkTweeter,
+        diasHorariosEmpresas: diasHorariosEmpresas
     });
     newTienda.activo = true;
     if(req.file){
@@ -54,6 +50,19 @@ tiendaCtrl.crearTienda = async (req, res) => {
         }
     })
 };
+
+tiendaCtrl.politicasEmpresa = async (req,res) => {
+    try {
+        console.log(req.body);
+        //{ politicas,PoliticasVentas,PoliticasEnvios,PoliticasDescuentos,PoliticasDevolucion }
+        await Tienda.findByIdAndUpdate(req.params.idTienda,req.body);
+        res.status(200).json({message: "Politicas agregadas"});
+    } catch (error) {
+        res.status(500).json({ message: 'Hubo un error al obtener esta tienda', error });
+        console.log(error);
+    }
+}
+
 tiendaCtrl.obtenerTienda = async (req, res) => {
     try {
         const tienda = await Tienda.find();
@@ -64,7 +73,7 @@ tiendaCtrl.obtenerTienda = async (req, res) => {
 };
 
 tiendaCtrl.actualizarTienda = async (req, res) => {
-    const {nombre,telefono,calle_numero,cp,colonia,ciudad,lat,lng,politicas,imagenCorp,linkFace,linkInsta,linkTweeter,estado} = req.body;
+    const {nombre,telefono,calle_numero,cp,colonia,ciudad,lat,lng,politicas,imagenCorp,linkFace,linkInsta,linkTweeter,estado,diasHorariosEmpresas} = req.body;
     const infoTiendaBase =  await Tienda.findById(req.params.idTienda);
     const newTienda = {
         nombre: nombre,
@@ -84,7 +93,8 @@ tiendaCtrl.actualizarTienda = async (req, res) => {
         imagenCorp:imagenCorp,
         linkFace:linkFace,
         linkInsta:linkInsta,
-        linkTweeter:linkTweeter
+        linkTweeter:linkTweeter,
+        diasHorariosEmpresas:diasHorariosEmpresas
     };
     console.log(req.file);
     if(req.file){

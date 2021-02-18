@@ -1250,22 +1250,18 @@ apartadoCtrl.obtenerUnApartado = async (req, res) => {
 };
 
 apartadoCtrl.eliminarApartadoCambiarEstado = async (req, res) => {
-	try {
-		console.log(req.params.idApartado);
-		await Apartado.findOneAndUpdate({ _id: req.params.idApartado }, { eliminado: true }, (err, response) => {
-			if (err) {
-				res.status(500).json({ message: 'Hubo un error al actualizar el apartado', err });
+	console.log(req.params.idApartado);
+	await Apartado.findOneAndUpdate({ _id: req.params.idApartado }, { eliminado: true }, (err, response) => {
+		if (err) {
+			res.status(500).json({ message: 'Hubo un error al actualizar el apartado', err });
+		} else {
+			if (!response) {
+				res.status(404).json({ message: 'Apartado no encontrado' });
 			} else {
-				if (!response) {
-					res.status(404).json({ message: 'Apartado no encontrado' });
-				} else {
-					res.status(200).json({ message: 'Apartado Actualizado', response });
-				}
+				res.status(200).json({ message: 'Apartado Actualizado', response });
 			}
-		});
-	} catch (err) {
-		res.status(500).json({ message: 'Hubo un error al obtener apartado', err });
-	}
+		}
+	});
 };
 
 module.exports = apartadoCtrl;

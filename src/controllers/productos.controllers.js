@@ -5,10 +5,7 @@ const promocionModel = require('../models/PromocionProducto');
 const sugerenciaModel = require('../models/Sugerencia');
 const galeriaModel = require('../models/Galeria');
 const corouselModel = require('../models/Carousel');
-const carritoModel = require('../models/Carrito');
-const mongoose = require('mongoose')
-const util = require('util')
-const sleep = util.promisify(setTimeout);
+const mongoose = require('mongoose');
 
 productosCtrl.deleteImagen = async (req, res) => {
 	try {
@@ -517,60 +514,130 @@ productosCtrl.getProductoSinPaginacion = async (req, res) => {
 };
 
 productosCtrl.getProductosFiltrosDividos = async (req, res) => {
-	const { categoria = '', subcategoria = '', genero = '' } = req.query;
-
-	var match = {};
-	if (categoria && !subcategoria && !genero) {
-		match = {
-			$or: [ { eliminado: { $exists: false } }, { eliminado: false } ],
-			$and: [ { categoria: { $regex: '.*' + categoria + '.*', $options: 'i' } } ]
-		};
-	} else if (categoria && subcategoria && !genero) {
-		match = {
-			$or: [ { eliminado: { $exists: false } }, { eliminado: false } ],
-			$and: [
-				{ categoria: { $regex: '.*' + categoria + '.*', $options: 'i' } },
-				{ subCategoria: { $regex: '.*' + subcategoria + '.*', $options: 'i' } }
-			]
-		};
-	} else if (categoria && subcategoria && genero) {
-		match = {
-			$or: [ { eliminado: { $exists: false } }, { eliminado: false } ],
-			$and: [
-				{ categoria: { $regex: '.*' + categoria + '.*', $options: 'i' } },
-				{ subCategoria: { $regex: '.*' + subcategoria + '.*', $options: 'i' } },
-				{ genero: { $regex: '.*' + genero + '.*', $options: 'i' } }
-			]
-		};
-	} else if (subcategoria && !categoria && !genero) {
-		match = {
-			$or: [ { eliminado: { $exists: false } }, { eliminado: false } ],
-			$and: [ { subCategoria: { $regex: '.*' + subcategoria + '.*', $options: 'i' } } ]
-		};
-	} else if (subcategoria && genero && !categoria) {
-		match = {
-			$or: [ { eliminado: { $exists: false } }, { eliminado: false } ],
-			$and: [
-				{ subCategoria: { $regex: '.*' + subcategoria + '.*', $options: 'i' } },
-				{ genero: { $regex: '.*' + genero + '.*', $options: 'i' } }
-			]
-		};
-	} else if (categoria && genero && !subcategoria) {
-		match = {
-			$or: [ { eliminado: { $exists: false } }, { eliminado: false } ],
-			$and: [
-				{ categoria: { $regex: '.*' + categoria + '.*', $options: 'i' } },
-				{ genero: { $regex: '.*' + genero + '.*', $options: 'i' } }
-			]
-		};
-	} else if (genero && !categoria && !subcategoria) {
-		match = {
-			$or: [ { eliminado: { $exists: false } }, { eliminado: false } ],
-			$and: [ { genero: { $regex: '.*' + genero + '.*', $options: 'i' } } ]
-		};
-	}
-
 	try {
+		const { categoria = '', subcategoria = '', genero = '', temporada = '' } = req.query;
+		var match = {};
+
+		if (categoria && !subcategoria && !genero && !temporada) {
+			match = {
+				$or: [ { eliminado: { $exists: false } }, { eliminado: false } ],
+				$and: [ { categoria: { $regex: '.*' + categoria + '.*', $options: 'i' } } ]
+			};
+		} else if (categoria && subcategoria && !genero && !temporada) {
+			match = {
+				$or: [ { eliminado: { $exists: false } }, { eliminado: false } ],
+				$and: [
+					{ categoria: { $regex: '.*' + categoria + '.*', $options: 'i' } },
+					{ subCategoria: { $regex: '.*' + subcategoria + '.*', $options: 'i' } }
+				]
+			};
+		} else if (categoria && subcategoria && genero && !temporada) {
+			match = {
+				$or: [ { eliminado: { $exists: false } }, { eliminado: false } ],
+				$and: [
+					{ categoria: { $regex: '.*' + categoria + '.*', $options: 'i' } },
+					{ subCategoria: { $regex: '.*' + subcategoria + '.*', $options: 'i' } },
+					{ genero: { $regex: '.*' + genero + '.*', $options: 'i' } }
+				]
+			};
+		} else if (categoria && subcategoria && genero && temporada) {
+			match = {
+				$or: [ { eliminado: { $exists: false } }, { eliminado: false } ],
+				$and: [
+					{ categoria: { $regex: '.*' + categoria + '.*', $options: 'i' } },
+					{ subCategoria: { $regex: '.*' + subcategoria + '.*', $options: 'i' } },
+					{ genero: { $regex: '.*' + genero + '.*', $options: 'i' } },
+					{ temporada: { $regex: '.*' + temporada + '.*', $options: 'i' } }
+				]
+			};
+		} else if (categoria && !subcategoria && genero && !temporada ) {
+			match = {
+				$or: [ { eliminado: { $exists: false } }, { eliminado: false } ],
+				$and: [ 
+					{ categoria: { $regex: '.*' + categoria + '.*', $options: 'i' } },
+					{ genero: { $regex: '.*' + genero + '.*', $options: 'i' } }
+				]
+			};
+		} else if (categoria && subcategoria && !genero && temporada ) {
+			match = {
+				$or: [ { eliminado: { $exists: false } }, { eliminado: false } ],
+				$and: [
+					{ categoria: { $regex: '.*' + categoria + '.*', $options: 'i' } },
+					{ subCategoria: { $regex: '.*' + subcategoria + '.*', $options: 'i' } },
+					{ temporada: { $regex: '.*' + temporada + '.*', $options: 'i' } }
+				]
+			};
+		} else if (categoria && !subcategoria && !genero && temporada ) {
+			match = {
+				$or: [ { eliminado: { $exists: false } }, { eliminado: false } ],
+				$and: [
+					{ categoria: { $regex: '.*' + categoria + '.*', $options: 'i' } },
+					{ temporada: { $regex: '.*' + temporada + '.*', $options: 'i' } }
+				]
+			};
+		} else if (!categoria && subcategoria && !genero && !temporada ) {
+			match = {
+				$or: [ { eliminado: { $exists: false } }, { eliminado: false } ],
+				$and: [
+					{ subCategoria: { $regex: '.*' + subcategoria + '.*', $options: 'i' } }
+				]
+			};
+		} else if (!categoria && subcategoria && genero && !temporada ) {
+			match = {
+				$or: [ { eliminado: { $exists: false } }, { eliminado: false } ],
+				$and: [
+					{ genero: { $regex: '.*' + genero + '.*', $options: 'i' } },
+					{ subCategoria: { $regex: '.*' + subcategoria + '.*', $options: 'i' } }
+				]
+			};
+		} else if (!categoria && subcategoria && genero && temporada ) {
+			match = {
+				$or: [ { eliminado: { $exists: false } }, { eliminado: false } ],
+				$and: [
+					{ genero: { $regex: '.*' + genero + '.*', $options: 'i' } },
+					{ subCategoria: { $regex: '.*' + subcategoria + '.*', $options: 'i' } },
+					{ temporada: { $regex: '.*' + temporada + '.*', $options: 'i' } },
+
+				]
+			};
+		} else if (!categoria && subcategoria && !genero && temporada ) {
+			match = {
+				$or: [ { eliminado: { $exists: false } }, { eliminado: false } ],
+				$and: [
+					{ temporada: { $regex: '.*' + temporada + '.*', $options: 'i' } },
+					{ subCategoria: { $regex: '.*' + subcategoria + '.*', $options: 'i' } }
+				]
+			};
+		} else if (!categoria && !subcategoria && genero && !temporada ) {
+			console.log("Entro genero");
+			match = {
+				$or: [ { eliminado: { $exists: false } }, { eliminado: false } ],
+				$and: [
+					{ genero: { $regex: '.*' + genero + '.*', $options: 'i' } },
+				]
+			};
+		} else if (!categoria && !subcategoria && genero && temporada ) {
+			match = {
+				$or: [ { eliminado: { $exists: false } }, { eliminado: false } ],
+				$and: [
+					{ genero: { $regex: '.*' + genero + '.*', $options: 'i' } },
+					{ temporada: { $regex: '.*' + temporada + '.*', $options: 'i' } }
+				]
+			};
+		} else if (!categoria && !subcategoria && !genero && temporada ) {
+			match = {
+				$or: [ { eliminado: { $exists: false } }, { eliminado: false } ],
+				$and: [
+					{ temporada: { $regex: '.*' + temporada + '.*', $options: 'i' } },
+				]
+			};
+		}else{
+			console.log("Entro");
+			match = {
+				$or: [ { eliminado: { $exists: false } }, { eliminado: false } ]
+			};
+		}
+
 		await Producto.aggregate(
 			[
 				{
@@ -580,6 +647,9 @@ productosCtrl.getProductosFiltrosDividos = async (req, res) => {
 						foreignField: 'productoPromocion',
 						as: 'promocion'
 					}
+				},
+				{ 
+					$sort: { createdAt: -1 } 
 				},
 				{
 					$match: match
@@ -602,8 +672,48 @@ productosCtrl.getProductosFiltrosDividos = async (req, res) => {
 	}
 };
 
+productosCtrl.getProductosFiltroTemporada = async (req,res) => {
+    try {
+        const { temporada } = req.query;
+        await Producto.aggregate(
+			[
+				{
+					$lookup: {
+						from: 'promocions',
+						localField: '_id',
+						foreignField: 'productoPromocion',
+						as: 'promocion'
+					}
+				},
+				{
+					$match: {
+						$or: [
+							{ temporada: { $regex: '.*' + temporada + '.*', $options: 'i' } }
+						],
+						$and: [ { $or: [ { eliminado: { $exists: false } }, { eliminado: false } ] } ]
+					}
+				}
+			],
+			(err, postStored) => {
+				if (err) {
+					res.status(500).json({ message: 'Error en el servidor', err });
+				} else {
+					if (!postStored) {
+						res.status(404).json({ message: 'Error al mostrar Productos' });
+					} else {
+						res.status(200).json({ posts: postStored });
+					}
+				}
+			}
+		);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Error en el servidor",error });
+    }
+}
+
 productosCtrl.getProductosFiltrados = async (req, res) => {
-	const { nombre, categoria, subcategoria, genero, color } = req.query;
+	const { nombre, categoria, subcategoria, genero, color, temporada } = req.query;
 	try {
 		await Producto.aggregate(
 			[
@@ -622,7 +732,8 @@ productosCtrl.getProductosFiltrados = async (req, res) => {
 							{ categoria: { $regex: '.*' + categoria + '.*', $options: 'i' } },
 							{ subCategoria: { $regex: '.*' + subcategoria + '.*', $options: 'i' } },
 							{ genero: { $regex: '.*' + genero + '.*', $options: 'i' } },
-							{ color: { $regex: '.*' + color + '.*', $options: 'i' } }
+							{ color: { $regex: '.*' + color + '.*', $options: 'i' } },
+							{ temporada: { $regex: '.*' + temporada + '.*', $options: 'i' } }
 						],
 						$and: [ { $or: [ { eliminado: { $exists: false } }, { eliminado: false } ] } ]
 					}
@@ -646,7 +757,7 @@ productosCtrl.getProductosFiltrados = async (req, res) => {
 };
 
 productosCtrl.getProductosFiltradosAdmin = async (req, res) => {
-	const { codigo, nombre, categoria, subcategoria, genero, color } = req.query;
+	const { codigo, nombre, categoria, subcategoria, genero, color , temporada} = req.query;
 	try {
 		await Producto.aggregate(
 			[
@@ -666,7 +777,8 @@ productosCtrl.getProductosFiltradosAdmin = async (req, res) => {
 							{ categoria: { $regex: '.*' + categoria + '.*', $options: 'i' } },
 							{ subCategoria: { $regex: '.*' + subcategoria + '.*', $options: 'i' } },
 							{ genero: { $regex: '.*' + genero + '.*', $options: 'i' } },
-							{ color: { $regex: '.*' + color + '.*', $options: 'i' } }
+							{ color: { $regex: '.*' + color + '.*', $options: 'i' } },
+							{ temporada: { $regex: '.*' + temporada + '.*', $options: 'i' } }
 						],
 						$and: [ { $or: [ { eliminado: { $exists: false } }, { eliminado: false } ] } ]
 					}
@@ -820,19 +932,6 @@ productosCtrl.createProducto = async (req, res) => {
 		res.status(500).json({ message: 'Error en el servidor', err });
 	}
 };
-
-/* productosCtrl.getProducto = async (req, res, next) => {
-	try {
-		const producto = await Producto.findById(req.params.id);
-		if (!producto) {
-			res.status(404).json({ message: 'Este producto no existe' });
-			return next();
-		}
-		res.status(200).json(producto);
-	} catch (err) {
-		res.status(500).json({ message: 'Error en el servidor', err });
-	}
-}; */
 
 productosCtrl.updateProducto = async (req, res, next) => {
 	try {
@@ -1005,16 +1104,46 @@ productosCtrl.tipoCategoriasAgrupadas = async (req, res) => {
 
 productosCtrl.categoriasAgrupadas = async (req, res) => {
 	try {
-		const categorias = await Producto.aggregate([
+		await Producto.aggregate([
 			{
 				$match: {
 					$or: [ { eliminado: { $exists: false } }, { eliminado: false } ]
 				}
 			},
 			{ $group: { _id: '$categoria' } }
-		]);
-		res.status(200).json(categorias);
-		console.log(categorias);
+		],
+		async function(err, categorias) {
+			arrayCategorias = [];
+			console.log(categorias);
+			console.log(categorias.length);
+			for (i = 0; i < categorias.length; i++) {
+				if (categorias[i]._id !== null) {
+					if (categorias[i]._id) {
+					const tipoCategoriaBase = await Producto.aggregate(
+							[
+								{
+									$match: {
+										$or: [ { categoria: categorias[i]._id } ]
+									}
+								},
+								{
+									$group: { _id: '$tipoCategoria' }
+								}
+							],
+							async function(err, tipoCategoriaBase) {
+								return tipoCategoriaBase;
+							}
+						);
+						arrayCategorias.push({
+							_id: categorias[i]._id,
+							tipoCategoria: tipoCategoriaBase[0]._id
+						});
+					}
+				}
+			}
+			res.status(200).json(arrayCategorias);
+			console.log(arrayCategorias);
+		});
 	} catch (err) {
 		res.status(500).json({ message: 'Error en el servidor', err });
 	}
@@ -1039,6 +1168,22 @@ productosCtrl.subCategorias = async (req, res) => {
 	}
 };
 
+productosCtrl.agruparTemporada = async (req,res) => {
+	try {
+		const temporada = await Producto.aggregate([
+			{
+				$match: {
+					$or: [ { eliminado: { $exists: false } }, { eliminado: false } ]
+				}
+			},
+			{ $group: { _id: '$temporada' } }
+		]);
+		res.status(200).json(temporada);
+	} catch (error) {
+		res.status(500).json({ message: 'Error en el servidor', error });
+	}
+}
+
 productosCtrl.crecarFiltrosNavbar = async (req, res, next) => {
 	try {
 		await Producto.aggregate(
@@ -1055,11 +1200,9 @@ productosCtrl.crecarFiltrosNavbar = async (req, res, next) => {
 				console.log(categorias);
 				console.log(categorias.length);
 				for (i = 0; i < categorias.length; i++) {
-					console.log(i);
 					if (categorias[i]._id !== null) {
-						console.log('entro', i);
 						if (categorias[i]._id) {
-							await Producto.aggregate(
+						const subCategoriasBase =await Producto.aggregate(
 								[
 									{
 										$match: {
@@ -1071,14 +1214,13 @@ productosCtrl.crecarFiltrosNavbar = async (req, res, next) => {
 									}
 								],
 								async function(err, subCategoriasBase) {
-									console.log(subCategoriasBase);
-									console.log(categorias[i]._id);
-									arrayCategorias.push({
-										categoria: categorias[i]._id,
-										subcCategoria: subCategoriasBase
-									});
+									return subCategoriasBase;
 								}
 							);
+							arrayCategorias.push({
+								categoria: categorias[i]._id,
+								subcCategoria: subCategoriasBase
+							});
 						}
 					}
 

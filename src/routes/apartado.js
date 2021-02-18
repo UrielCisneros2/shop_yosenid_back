@@ -36,7 +36,7 @@ router.route('/:idApartado')
     .delete(auth,eliminarApartado)
 
 router.route('/traer/:id').get(auth,obtenerUnApartado)
-
+    
 router.route('/estado/eliminado/:idApartado').put(eliminarApartadoCambiarEstado)
 
 module.exports = router;
